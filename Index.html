@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FoodScan.com — Food Ingredient Scanner</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:#07110d;color:#f4fff8}
+body:before{content:"";position:fixed;inset:0;background:radial-gradient(circle at 20% 0%,#173d2a 0,transparent 38%),radial-gradient(circle at 100% 20%,#123426 0,transparent 35%);pointer-events:none}
+.wrap{position:relative;max-width:1050px;margin:auto;padding:24px 18px 60px}
+nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:45px}.brand{font-size:24px;font-weight:900;letter-spacing:-1px}.brand span{color:#59e391}
+.badge{border:1px solid #244b38;background:#0c1d15;padding:8px 12px;border-radius:999px;font-size:12px;color:#9fe8bd}
+.hero{text-align:center;max-width:800px;margin:auto}.hero h1{font-size:clamp(42px,8vw,78px);line-height:.95;margin:0 0 18px;letter-spacing:-4px}.hero h1 span{color:#59e391}.hero p{color:#a9c5b5;font-size:18px;line-height:1.6;margin:0 auto 28px}
+.scan{background:rgba(10,27,19,.9);border:1px solid #234936;border-radius:28px;padding:20px;box-shadow:0 20px 70px #0007;max-width:760px;margin:32px auto 20px}
+.drop{min-height:280px;border:2px dashed #315e48;border-radius:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s;background:linear-gradient(145deg,#0c2117,#091811)}
+.drop:hover,.drop.drag{border-color:#59e391;background:#10291c}.drop h2{margin:10px 0 6px}.drop p{margin:0;color:#86a695}.icon{font-size:54px}.buttons{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+button{border:0;border-radius:12px;padding:13px 18px;font-weight:800;cursor:pointer;font-size:14px}.primary{background:#59e391;color:#06120b}.secondary{background:#173426;color:#dfffee;border:1px solid #2b5943}
+input{display:none}.demo{margin-top:12px;font-size:12px;color:#779487}
+#results{display:none;margin-top:28px}.resultHead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}.resultHead h2{margin:0}.card{background:#0c1c14;border:1px solid #234936;border-radius:20px;padding:20px;margin-bottom:14px}
+.foodname{font-size:28px;font-weight:900}.confidence{font-size:12px;color:#7ee8a9;margin-top:5px}.tags{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}.tag{padding:9px 12px;background:#142c20;border:1px solid #2a513c;border-radius:999px;color:#d9f9e5;font-size:13px}
+.note{color:#8fa99b;line-height:1.5;font-size:13px;margin-top:15px}.warn{border-left:3px solid #e7b94e;padding-left:12px;color:#dbc78e}
+footer{text-align:center;color:#648072;font-size:12px;margin-top:45px}
+@media(max-width:600px){.wrap{padding:18px 12px 45px}.hero h1{letter-spacing:-2px}.scan{padding:12px;border-radius:22px}.drop{min-height:230px}.resultHead{align-items:flex-start;flex-direction:column}}
+
+.demoPhoto{display:none;margin-top:14px;border-radius:18px;overflow:hidden;border:1px solid #315e48;background:#07110d}
+.demoPhoto img{width:100%;height:230px;object-fit:cover;display:block}
+.demoLabel{padding:11px 14px;text-align:left;font-size:12px;color:#a9c5b5}
+.how{margin-top:12px;text-align:center;color:#8fa99b;font-size:13px}
+.how b{color:#59e391}
+
+</head>
+<body>
+<div class="wrap">
+<nav><div class="brand">foodscan<span>.com</span></div><div class="badge">AI FOOD SCANNER</div></nav>
+<section class="hero">
+<h1>Know what's<br><span>inside your food.</span></h1>
+<p>Upload a photo of a food package, label, or dish. FoodScan identifies visible ingredients and gives you a clear, easy-to-read result.</p>
+<div class="scan">
+<label class="drop" id="drop">
+  <input id="file" type="file" accept="image/*">
+  <div>
+    <div class="icon">📷</div>
+    <h2>Scan your food</h2>
+    <p>Tap to upload a food photo</p>
+    <div class="demo">JPG, PNG or WEBP • image stays in your browser for this demo</div>
+  </div>
+
+</label>
+<div class="demoPhoto" id="demoPhoto">
+  <img alt="Demo food photo" src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 900 520'%3E%3Cdefs%3E%3CradialGradient id='bg'%3E%3Cstop stop-color='%234b3825'/%3E%3Cstop offset='1' stop-color='%23140e09'/%3E%3C/radialGradient%3E%3CradialGradient id='pizza'%3E%3Cstop stop-color='%23ffd879'/%3E%3Cstop offset='.72' stop-color='%23d97822'/%3E%3Cstop offset='1' stop-color='%239b3f12'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='900' height='520' fill='url(%23bg)'/%3E%3Cellipse cx='450' cy='285' rx='315' ry='175' fill='%23000000' opacity='.45'/%3E%3Cellipse cx='450' cy='255' rx='300' ry='165' fill='url(%23pizza)' stroke='%23f4c15d' stroke-width='9'/%3E%3Cg fill='%23b93821'%3E%3Cellipse cx='340' cy='205' rx='31' ry='21'/%3E%3Cellipse cx='515' cy='185' rx='29' ry='20'/%3E%3Cellipse cx='565' cy='285' rx='31' ry='21'/%3E%3Cellipse cx='385' cy='320' rx='29' ry='20'/%3E%3C/g%3E%3Cg fill='%23f5e8c0'%3E%3Ccircle cx='425' cy='215' r='10'/%3E%3Ccircle cx='485' cy='275' r='11'/%3E%3Ccircle cx='350' cy='265' r='9'/%3E%3C/g%3E%3Cg fill='%235a8f48'%3E%3Cellipse cx='455' cy='160' rx='10' ry='20' transform='rotate(25 455 160)'/%3E%3Cellipse cx='520' cy='325' rx='10' ry='20' transform='rotate(-35 520 325)'/%3E%3C/g%3E%3Ctext x='450' y='470' text-anchor='middle' font-family='Arial' font-size='30' fill='white' opacity='.9'%3EFoodScan Demo Food%3C/text%3E%3C/svg%3E">
+  <div class="demoLabel">📸 Example photo: FoodScan sees the food and shows the ingredients below.</div>
+</div>
+<div class="how"><b>How it works:</b> Photo → Food recognition → Ingredient list</div>
+<div class="buttons">
+<button class="primary" id="camera">📸 Open Camera</button>
+<button class="secondary" id="demo">✨ Try Demo Scan</button>
+</div>
+</div>
+</section>
+
+<section id="results">
+<div class="resultHead"><h2>Scan result</h2><button class="secondary" id="again">Scan another</button></div>
+<div class="card">
+<div class="foodname" id="food">Chocolate Chip Cookies</div>
+<div class="confidence" id="confidence">Demo result • ingredients shown as an example</div>
+<div class="tags" id="tags"></div>
+<p class="note warn">Important: FoodScan is a prototype. A photo cannot reliably determine every ingredient or allergen. Always check the manufacturer's ingredient label, especially for allergies or medical dietary needs.</p>
+</div>
+</section>
+<footer>foodscan.com • Ingredient recognition prototype</footer>
+</div>
+
+<script>
+const file=document.getElementById('file'),drop=document.getElementById('drop'),results=document.getElementById('results');
+const tags=document.getElementById('tags');
+function showDemo(name="Chocolate Chip Cookies"){
+ const data={
+ "Chocolate Chip Cookies":["Wheat flour","Sugar","Butter","Chocolate chips","Eggs","Baking soda","Salt","Vanilla"],
+ "Pizza":["Wheat flour","Tomato","Mozzarella cheese","Olive oil","Yeast","Salt","Basil"],
+ "Banana Smoothie":["Banana","Milk","Ice","Honey"],
+ "Instant Noodles":["Wheat flour","Palm oil","Salt","Soy sauce powder","Spices","Garlic powder","Onion powder"]
+ };
+ document.getElementById('food').textContent=name;
+ tags.innerHTML=(data[name]||["Ingredient recognition demo","Upload a clearer ingredient-label photo for real OCR integration"]).map(x=>`<span class="tag">${x}</span>`).join("");
+ results.style.display="block";results.scrollIntoView({behavior:"smooth",block:"start"});
+}
+document.getElementById('demo').onclick=()=>{
+ document.getElementById('demoPhoto').style.display='block';
+ showDemo("Pizza");
+};
+document.getElementById('again').onclick=()=>{results.style.display="none";file.value="";window.scrollTo({top:0,behavior:"smooth"})};
+file.onchange=()=>{if(file.files[0])showDemo("Scanned Food")};
+drop.ondragover=e=>{e.preventDefault();drop.classList.add("drag")};
+drop.ondragleave=()=>drop.classList.remove("drag");
+drop.ondrop=e=>{e.preventDefault();drop.classList.remove("drag");if(e.dataTransfer.files[0]){file.files=e.dataTransfer.files;showDemo("Scanned Food")}};
+document.getElementById('camera').onclick=()=>{file.setAttribute("capture","environment");file.click()};
+</script>
+</body>
+</html>
